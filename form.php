@@ -32,10 +32,10 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
 
 <form method="POST">
     <label for="username">Username:</label><br>
-    <input type="text" id="username" name="username" required><br><br>
+    <input type="text" id="username" name="username"><br><br>
 
     <label>Email:</label><br>
-    <input type="email" name="email" required><br><br>
+    <input type="email" name="email"><br><br>
 
     <button type="submit" name="submit">Сохранить</button>
 </form>
