@@ -1,5 +1,4 @@
 <?php
-require_once 'db.php';
 
 $message = "";
 
@@ -27,29 +26,16 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
 }
 ?>
 
-<!DOCTYPE html>
-<html lang="ru">
-<head>
-    <meta charset="UTF-8">
-    <title>Регистрация пользователя</title>
-</head>
-<body>
-
-<h2>Форма пользователя</h2>
-
 <?php if ($message): ?>
     <p><?= $message ?></p>
 <?php endif; ?>
 
 <form method="POST">
-    <label>Username:</label><br>
-    <input type="text" name="username"><br><br>
+    <label for="username">Username:</label><br>
+    <input type="text" id="username" name="username" required><br><br>
 
     <label>Email:</label><br>
-    <input type="email" name="email"><br><br>
+    <input type="email" name="email" required><br><br>
 
-    <button type="submit">Сохранить</button>
+    <button type="submit" name="submit">Сохранить</button>
 </form>
-
-</body>
-</html>

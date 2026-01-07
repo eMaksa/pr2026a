@@ -1,10 +1,27 @@
-<?php include 'db.php'; ?>
+<?php require_once 'db.php'; ?>
 <!DOCTYPE html>
 <html lang="ru">
 <head>
  <meta charset="UTF-8">
  <title>Управление пользователями</title>
- <link rel="stylesheet" href="style.css"> </head>
+<style>
+        body {
+            font-family: Arial, sans-serif;
+        }
+        table {
+            border-collapse: collapse;
+            width: 60%;
+        }
+        th, td {
+            border: 1px solid #333;
+            padding: 8px 12px;
+            text-align: left;
+        }
+        th {
+            background-color: #eaeaea;
+        }
+    </style>
+</head>
 <body>
  <h1>Система учета практикантов</h1>
  <section>
