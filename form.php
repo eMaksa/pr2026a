@@ -18,7 +18,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
         if ($stmt->execute()) {
             $message = "Данные успешно сохранены!";
         } else {
-            $message = "Ошибка при сохранении данных.";
+            $message = "Ошибка при сохранении данных: " . $stmt->error;
         }
 
         $stmt->close();
