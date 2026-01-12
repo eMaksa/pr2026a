@@ -1,20 +1,46 @@
 <?php
 require_once 'db.php';
-header('Content-Type: application/json'); // Говорим браузеру, что это JSON
+header('Content-Type: application/json');
+
+$response = ['status' => 'success', 'message' => '', 'users' => []];
+
+if ($_SERVER["REQUEST_METHOD"] === "GET") {
+    $result = $conn->query("SELECT * FROM users");
+    while ($row = $result->fetch_assoc()) {
+        $response['users'][] = $row;
+    }
+    echo json_encode($response);
+    exit;
+}
+
 if ($_SERVER["REQUEST_METHOD"] == "POST") {
     $username = trim($_POST["username"] ?? '');
     $email = trim($_POST["email"] ?? '');
+
     if (empty($username) || empty($email)) {
-        echo json_encode(['status' => 'error', 'message' => 'Все поля обязательны!']);
+        $response['status'] = 'error';
+        $response['message'] = 'Все поля обязательны!';
+        echo json_encode($response);
         exit;
     }
-    $sql = "INSERT INTO users (username, email) VALUES (?, ?)";
-    $stmt = $conn->prepare($sql);
+
+    $stmt = $conn->prepare("INSERT INTO users (username, email) VALUES (?, ?)");
     $stmt->bind_param("ss", $username, $email);
+
     if ($stmt->execute()) {
-        echo json_encode(['status' => 'success', 'message' => 'Пользователь добавлен!']);
+        $response['status'] = 'success';
+        $response['message'] = 'Пользователь добавлен!';
+
+        $stmt->close();
+
+        $result = $conn->query("SELECT * FROM users");
+        while ($row = $result->fetch_assoc()) {
+            $response['users'][] = $row;
+        }
     } else {
-        echo json_encode(['status' => 'error', 'message' => 'Ошибка базы: ' . $conn->error]);
+        $response['status'] = 'error';
+        $response['message'] = 'Ошибка базы: ' . $stmt->error;
     }
-    $stmt->close();
+
+    echo json_encode($response);
 }

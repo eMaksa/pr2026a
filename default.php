@@ -40,27 +40,54 @@
         <?php include 'display.php'; ?>
     </section>
     <script>
-        document.querySelector('form').addEventListener('submit', function(e) {
+        const messageDiv = document.getElementById('message');
+        const usersBody = document.getElementById('usersBody');
+        const form = document.querySelector('form');
+
+        function renderTable(users) {
+            usersBody.innerHTML = '';
+            if (!users.length) {
+                usersBody.innerHTML = '<tr><td colspan="3">Пользователей пока нет</td></tr>';
+                return;
+            }
+            users.forEach(u => {
+                usersBody.innerHTML += `
+            <tr>
+                <td>${u.id}</td>
+                <td>${u.username}</td>
+                <td>${u.email}</td>
+            </tr>
+        `;
+            });
+        }
+
+        fetch('handler.php')
+            .then(r => r.json())
+            .then(data => renderTable(data.users))
+            .catch(() => {
+                messageDiv.textContent = 'Ошибка при загрузке пользователей';
+                messageDiv.style.color = 'red';
+            });
+
+        form.addEventListener('submit', function(e) {
             e.preventDefault();
-            const formData = new FormData(this);
             fetch('handler.php', {
                     method: 'POST',
-                    body: formData
+                    body: new FormData(this)
                 })
-                .then(response => {
-                if (!response.ok) throw new Error('Сервер ответил ошибкой ' + response.status);
-                return response.json();
-})
+                .then(r => r.json())
                 .then(data => {
+                    messageDiv.textContent = data.message;
+                    messageDiv.style.color = data.status === 'success' ? 'green' : 'red';
                     if (data.status === 'success') {
-                        alert(data.message);
-                        this.reset();
-                        window.location.reload()
-                    } else {
-                        alert('Ошибка: ' + data.message);
+                        renderTable(data.users);
+                        form.reset();
                     }
                 })
-                .catch(error => console.error('Ошибка сети:', error));
+                .catch(() => {
+                    messageDiv.textContent = 'Ошибка сети';
+                    messageDiv.style.color = 'red';
+                });
         });
     </script>
 </body>
