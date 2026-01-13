@@ -18,6 +18,30 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
     $email = trim($_POST["email"] ?? '');
     $id = $_POST['id'] ?? '';
 
+    $delete_id = $_POST['delete_id'] ?? '';
+
+    if (!empty($delete_id)) {
+        $stmt = $conn->prepare("DELETE FROM users WHERE id = ?");
+        $stmt->bind_param("i", $delete_id);
+
+        if ($stmt->execute()) {
+            $response['message'] = 'Пользователь удалён!';
+        } else {
+            $response['status'] = 'error';
+            $response['message'] = 'Ошибка удаления';
+        }
+
+        $stmt->close();
+
+        $result = $conn->query("SELECT * FROM users");
+        while ($row = $result->fetch_assoc()) {
+            $response['users'][] = $row;
+        }
+
+        echo json_encode($response);
+        exit;
+    }
+
     if (empty($username) || empty($email)) {
         $response['status'] = 'error';
         $response['message'] = 'Все поля обязательны!';

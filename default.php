@@ -47,7 +47,7 @@
         function renderTable(users) {
             usersBody.innerHTML = '';
             if (!users.length) {
-                usersBody.innerHTML = '<tr><td colspan="3">Пользователей пока нет</td></tr>';
+                usersBody.innerHTML = '<tr><td colspan="4">Пользователей пока нет</td></tr>';
                 return;
             }
             users.forEach(u => {
@@ -60,6 +60,9 @@
                 <button onclick="editUser(${u.id}, '${u.username}', '${u.email}')">
                     Редактировать
                 </button>
+                <button onclick="deleteUser(${u.id})">
+                    Удалить
+                </button>
             </td>
             </tr>
         `;
@@ -67,9 +70,27 @@
         }
 
         function editUser(id, username, email) {
-        document.getElementById('user_id').value = id;
-        document.getElementById('username').value = username;
-        document.getElementById('email').value = email;
+            document.getElementById('user_id').value = id;
+            document.getElementById('username').value = username;
+            document.getElementById('email').value = email;
+        }
+
+        function deleteUser(id) {
+            if (!confirm('Удалить пользователя?')) return;
+
+            const formData = new FormData();
+            formData.append('delete_id', id);
+
+            fetch('handler.php', {
+                    method: 'POST',
+                    body: formData
+                })
+                .then(r => r.json())
+                .then(data => {
+                    messageDiv.textContent = data.message;
+                    messageDiv.style.color = data.status === 'success' ? 'green' : 'red';
+                    renderTable(data.users);
+                });
         }
 
         fetch('handler.php')
