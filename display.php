@@ -5,6 +5,7 @@
         <th>ID</th>
         <th>Username</th>
         <th>Email</th>
+        <th>Edit</th>
     </tr>
     <tbody id="usersBody">
         <tr>

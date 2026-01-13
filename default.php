@@ -56,9 +56,20 @@
                 <td>${u.id}</td>
                 <td>${u.username}</td>
                 <td>${u.email}</td>
+                <td>
+                <button onclick="editUser(${u.id}, '${u.username}', '${u.email}')">
+                    Редактировать
+                </button>
+            </td>
             </tr>
         `;
             });
+        }
+
+        function editUser(id, username, email) {
+        document.getElementById('user_id').value = id;
+        document.getElementById('username').value = username;
+        document.getElementById('email').value = email;
         }
 
         fetch('handler.php')
