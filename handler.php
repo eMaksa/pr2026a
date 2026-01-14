@@ -17,6 +17,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
     $username = trim($_POST["username"] ?? '');
     $email = trim($_POST["email"] ?? '');
     $id = $_POST['id'] ?? '';
+    $gender_id  = $_POST['gender_id'] ?? '';
 
     $delete_id = $_POST['delete_id'] ?? '';
 
@@ -42,7 +43,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
         exit;
     }
 
-    if (empty($username) || empty($email)) {
+    if (empty($username) || empty($email) || empty($gender_id)) {
         $response['status'] = 'error';
         $response['message'] = 'Все поля обязательны!';
         echo json_encode($response);
@@ -51,9 +52,9 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
 
     if (!empty($id)) {
         $stmt = $conn->prepare(
-            "UPDATE users SET username = ?, email = ? WHERE id = ?"
+            "UPDATE users SET username = ?, email = ?, gender_id = ? WHERE id = ?"
         );
-        $stmt->bind_param("ssi", $username, $email, $id);
+        $stmt->bind_param("ssi", $username, $email, $gender_id, $id);
 
         if ($stmt->execute()) {
             $response['status'] = 'success';
@@ -74,8 +75,8 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
         exit;
     }
 
-    $stmt = $conn->prepare("INSERT INTO users (username, email) VALUES (?, ?)");
-    $stmt->bind_param("ss", $username, $email);
+    $stmt = $conn->prepare("INSERT INTO users (username, email, gender_id) VALUES (?, ?)");
+    $stmt->bind_param("ss", $username, $email, $gender_id);
 
     if ($stmt->execute()) {
         $response['status'] = 'success';
