@@ -2,14 +2,15 @@
 
 <table>
     <tr>
-        <th>ID</th>
         <th>Username</th>
         <th>Email</th>
+        <th>Gender</th>
+        <th>Faculty</th>
         <th>Edit</th>
     </tr>
     <tbody id="usersBody">
         <tr>
-            <td colspan="4">Пользователей пока нет</td>
+            <td colspan="5">Пользователей пока нет</td>
         </tr>
     </tbody>
 </table>
