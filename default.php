@@ -71,33 +71,43 @@
         function renderTable(users) {
             usersBody.innerHTML = '';
             if (!users.length) {
-                usersBody.innerHTML = '<tr><td colspan="4">Пользователей пока нет</td></tr>';
+                usersBody.innerHTML = '<tr><td colspan="5">Пользователей пока нет</td></tr>';
                 return;
             }
             users.forEach(u => {
                 usersBody.innerHTML += `
-            <tr>
-                <td>${u.id}</td>
-                <td>${u.username}</td>
-                <td>${u.email}</td>
-                <td>
-                <button onclick="editUser(${u.id}, '${u.username}', '${u.email}')">
-                    Редактировать
-                </button>
-                <button onclick="deleteUser(${u.id})">
-                    Удалить
-                </button>
-            </td>
-            </tr>
-        `;
+    <tr>
+        <td>${u.username}</td>
+        <td>${u.email}</td>
+        <td>${u.gender}</td>
+        <td>${u.faculty}</td>
+        <td>
+            <button onclick="editUser(
+                ${u.id},
+                '${u.username}',
+                '${u.email}',
+                ${u.gender_id},
+                ${u.faculty_id}
+            )">
+                Редактировать
+            </button>
+
+            <button onclick="deleteUser(${u.id})">
+                Удалить
+            </button>
+        </td>
+    </tr>`;
             });
         }
 
-        function editUser(id, username, email) {
-            document.getElementById('user_id').value = id;
-            document.getElementById('username').value = username;
-            document.getElementById('email').value = email;
-        }
+        function editUser(id, username, email, gender_id, faculty_id) {
+    document.getElementById('user_id').value = id;
+    document.getElementById('username').value = username;
+    document.querySelector('input[name="email"]').value = email;
+
+    document.getElementById('gender').value = gender_id;
+    document.getElementById('faculty').value = faculty_id;
+}
 
         function deleteUser(id) {
             if (!confirm('Удалить пользователя?')) return;

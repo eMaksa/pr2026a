@@ -9,7 +9,7 @@
     </tr>
     <tbody id="usersBody">
         <tr>
-            <td colspan="4">Пользователей пока нет</td>
+            <td colspan="5">Пользователей пока нет</td>
         </tr>
     </tbody>
 </table>
