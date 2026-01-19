@@ -40,6 +40,30 @@
         <?php include 'display.php'; ?>
     </section>
     <script>
+        let currentSort = {
+            field: null,
+            asc: true
+        };
+
+        function sortTable(field) {
+            currentSort.asc = (currentSort.field === field) ? !currentSort.asc : true;
+            currentSort.field = field;
+
+            fetch('handler.php')
+                .then(r => r.json())
+                .then(data => {
+                    let users = data.users;
+
+                    users.sort((a, b) => {
+                        if (a[field] < b[field]) return currentSort.asc ? -1 : 1;
+                        if (a[field] > b[field]) return currentSort.asc ? 1 : -1;
+                        return 0;
+                    });
+
+                    renderTable(users);
+                });
+        }
+
         const messageDiv = document.getElementById('message');
         const usersBody = document.getElementById('usersBody');
         const form = document.querySelector('form');
@@ -126,8 +150,14 @@
                         form.reset();
                     }
                 })
-                .catch(() => {
-                    messageDiv.textContent = 'Ошибка сети';
+                .catch(err => {
+                    console.error(err); // для консоли разработчика
+
+                    messageDiv.textContent =
+                        err.message ?
+                        `Ошибка: ${err.message}` :
+                        'Неизвестная ошибка при отправке запроса';
+
                     messageDiv.style.color = 'red';
                 });
         });

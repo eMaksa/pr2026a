@@ -2,10 +2,13 @@
 
 <table>
     <tr>
-        <th>Username</th>
-        <th>Email</th>
-        <th>Gender</th>
-        <th>Faculty</th>
+
+        <th onclick="sortTable('username')" style="cursor:pointer">Username ▲▼</th>
+        <th onclick="sortTable('email')" style="cursor:pointer">Email ▲▼</th>
+        <th onclick="sortTable('gender')" style="cursor:pointer">Gender ▲▼</th>
+        <th onclick="sortTable('faculty')" style="cursor:pointer">Faculty ▲▼</th>
+
+
         <th>Edit</th>
     </tr>
     <tbody id="usersBody">
