@@ -101,13 +101,13 @@
         }
 
         function editUser(id, username, email, gender_id, faculty_id) {
-    document.getElementById('user_id').value = id;
-    document.getElementById('username').value = username;
-    document.querySelector('input[name="email"]').value = email;
+            document.getElementById('user_id').value = id;
+            document.getElementById('username').value = username;
+            document.querySelector('input[name="email"]').value = email;
 
-    document.getElementById('gender').value = gender_id;
-    document.getElementById('faculty').value = faculty_id;
-}
+            document.getElementById('gender').value = gender_id;
+            document.getElementById('faculty').value = faculty_id;
+        }
 
         function deleteUser(id) {
             if (!confirm('Удалить пользователя?')) return;
@@ -136,28 +136,51 @@
             });
 
         form.addEventListener('submit', function(e) {
-            e.preventDefault();
+                e.preventDefault();
+                fetch('handler.php', {
+                        method: 'POST',
+                        body: new FormData(this)
+                    })
+                    .then(r => r.json())
+                    .then(data => {
+                        messageDiv.textContent = data.message;
+                        messageDiv.style.color = data.status === 'success' ? 'green' : 'red';
+                        if (data.status === 'success') {
+                            renderTable(data.users);
+                            form.reset();
+                        }
+                    })
+                    .catch(err => {
+                        console.error(err); // для консоли разработчика
+
+                        messageDiv.textContent =
+                            err.message ?
+                            `Ошибка: ${err.message}` :
+                            'Неизвестная ошибка при отправке запроса';
+
+                        messageDiv.style.color = 'red';
+                    });
+            }
+
+        );
+
+        document.getElementById('searchBtn').addEventListener('click', function() {
+            const formData = new FormData(form);
+            formData.append('action', 'search'); // будем отличать поиск от сохранения
+
             fetch('handler.php', {
                     method: 'POST',
-                    body: new FormData(this)
+                    body: formData
                 })
                 .then(r => r.json())
                 .then(data => {
                     messageDiv.textContent = data.message;
                     messageDiv.style.color = data.status === 'success' ? 'green' : 'red';
-                    if (data.status === 'success') {
-                        renderTable(data.users);
-                        form.reset();
-                    }
+                    renderTable(data.users);
                 })
                 .catch(err => {
-                    console.error(err); // для консоли разработчика
-
-                    messageDiv.textContent =
-                        err.message ?
-                        `Ошибка: ${err.message}` :
-                        'Неизвестная ошибка при отправке запроса';
-
+                    console.error(err);
+                    messageDiv.textContent = 'Ошибка поиска';
                     messageDiv.style.color = 'red';
                 });
         });

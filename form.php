@@ -3,7 +3,7 @@ $genders = $conn->query("SELECT id, name FROM genders");
 $faculties = $conn->query("SELECT id, name FROM faculties");
 ?>
 
-<form method="POST">
+<form method="POST" id="userForm">
     <input type="hidden" name="id" id="user_id">
 
     <label>Username:</label><br>
@@ -29,5 +29,6 @@ $faculties = $conn->query("SELECT id, name FROM faculties");
     </select><br><br>
 
     <button type="submit">Сохранить</button>
+    <button type="button" id="searchBtn">Поиск</button>
 
 </form>

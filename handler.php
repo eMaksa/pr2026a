@@ -35,6 +35,65 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
 
     $delete_id = $_POST['delete_id'] ?? '';
 
+    if (!empty($_POST['action']) && $_POST['action'] === 'search') {
+    $username   = trim($_POST['username'] ?? '');
+    $email      = trim($_POST['email'] ?? '');
+    $gender_id  = $_POST['gender_id'] ?? '';
+    $faculty_id = $_POST['faculty_id'] ?? '';
+
+    $sql = "SELECT users.id, users.username, users.email, users.gender_id, users.faculty_id,
+                   genders.name AS gender, faculties.name AS faculty
+            FROM users
+            JOIN genders ON users.gender_id = genders.id
+            JOIN faculties ON users.faculty_id = faculties.id
+            WHERE 1=1";
+
+    $params = [];
+    $types = '';
+
+    if ($username !== '') {
+        $sql .= " AND users.username LIKE ?";
+        $params[] = "%$username%";
+        $types .= 's';
+    }
+
+    if ($email !== '') {
+        $sql .= " AND users.email LIKE ?";
+        $params[] = "%$email%";
+        $types .= 's';
+    }
+
+    if ($gender_id !== '') {
+        $sql .= " AND users.gender_id = ?";
+        $params[] = $gender_id;
+        $types .= 'i';
+    }
+
+    if ($faculty_id !== '') {
+        $sql .= " AND users.faculty_id = ?";
+        $params[] = $faculty_id;
+        $types .= 'i';
+    }
+
+    $stmt = $conn->prepare($sql);
+    if ($params) {
+        $stmt->bind_param($types, ...$params);
+    }
+
+    $stmt->execute();
+    $result = $stmt->get_result();
+
+    $response['users'] = [];
+    while ($row = $result->fetch_assoc()) {
+        $response['users'][] = $row;
+    }
+
+    $response['message'] = 'Результаты поиска';
+    echo json_encode($response);
+    exit;
+}
+
+
     if (!empty($delete_id)) {
         $stmt = $conn->prepare("DELETE FROM users WHERE id = ?");
         $stmt->bind_param("i", $delete_id);
