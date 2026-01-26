@@ -19,3 +19,9 @@
 <a href="export_csv.php">
     <button type="button">Скачать CSV</button>
 </a>
+
+<br>
+<br>
+<a href="random_student.php" target="_blank">
+    <button type="button">🎲 Случайный студент дня</button>
+</a>
