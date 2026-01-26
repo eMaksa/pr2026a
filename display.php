@@ -14,3 +14,8 @@
         </tr>
     </tbody>
 </table>
+
+<br>
+<a href="export_csv.php">
+    <button type="button">Скачать CSV</button>
+</a>
