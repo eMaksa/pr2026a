@@ -31,8 +31,18 @@ SELECT 'Информатика'
 WHERE NOT EXISTS (SELECT 1 FROM faculties WHERE name='Информатика');
 
 INSERT INTO faculties (name)
+SELECT 'Математика'
+WHERE NOT EXISTS (SELECT 1 FROM faculties WHERE name='Математика');
+
+INSERT INTO faculties (name)
+SELECT 'Физика'
+WHERE NOT EXISTS (SELECT 1 FROM faculties WHERE name='Физика');
+
+INSERT INTO faculties (name)
 SELECT 'Экономика'
 WHERE NOT EXISTS (SELECT 1 FROM faculties WHERE name='Экономика');
+
+
 
 
 
