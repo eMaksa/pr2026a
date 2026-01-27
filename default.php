@@ -71,7 +71,7 @@
         function renderTable(users) {
             usersBody.innerHTML = '';
             if (!users.length) {
-                usersBody.innerHTML = '<tr><td colspan="5">Пользователей пока нет</td></tr>';
+                usersBody.innerHTML = '<tr><td colspan="6">Пользователей пока нет</td></tr>';
                 return;
             }
             users.forEach(u => {
@@ -81,13 +81,15 @@
         <td>${u.email}</td>
         <td>${u.gender}</td>
         <td>${u.faculty}</td>
+        <td>${u.status ?? ''}</td>
         <td>
             <button onclick="editUser(
                 ${u.id},
                 '${u.username}',
                 '${u.email}',
                 ${u.gender_id},
-                ${u.faculty_id}
+                ${u.faculty_id},
+                ${u.status_id ?? 1}
             )">
                 Редактировать
             </button>
@@ -107,6 +109,7 @@
 
             document.getElementById('gender').value = gender_id;
             document.getElementById('faculty').value = faculty_id;
+            document.querySelector('select[name="status_id"]').value = status_id;
         }
 
         function deleteUser(id) {

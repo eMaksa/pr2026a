@@ -6,17 +6,21 @@ $response = ['status' => 'success', 'message' => '', 'users' => []];
 
 if ($_SERVER["REQUEST_METHOD"] === "GET") {
     $result = $conn->query("
-        SELECT
-            users.id,
-            users.username,
-            users.email,
-            users.gender_id,
-            users.faculty_id,
-            genders.name   AS gender,
-            faculties.name AS faculty
-        FROM users
-        JOIN genders   ON users.gender_id = genders.id
-        JOIN faculties ON users.faculty_id = faculties.id
+            SELECT
+        users.id,
+        users.username,
+        users.email,
+        users.gender_id,
+        users.faculty_id,
+        genders.name AS gender,
+        faculties.name AS faculty,
+        intern_status.name AS status
+    FROM users
+    JOIN genders ON users.gender_id = genders.id
+    JOIN faculties ON users.faculty_id = faculties.id
+    LEFT JOIN intern_status ON users.status_id = intern_status.id
+
+        
         ");
 
     while ($row = $result->fetch_assoc()) {
@@ -32,6 +36,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
     $id = $_POST['id'] ?? '';
     $gender_id  = $_POST['gender_id'] ?? '';
     $faculty_id = $_POST['faculty_id'] ?? '';
+    $status_id = $_POST['status_id'] ?? '';
 
     $delete_id = $_POST['delete_id'] ?? '';
 
@@ -40,6 +45,8 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
         $email      = trim($_POST['email'] ?? '');
         $gender_id  = $_POST['gender_id'] ?? '';
         $faculty_id = $_POST['faculty_id'] ?? '';
+
+
 
         $sql = "SELECT users.id, users.username, users.email, users.gender_id, users.faculty_id,
                    genders.name AS gender, faculties.name AS faculty
@@ -102,28 +109,38 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
             $response['message'] = 'Пользователь удалён!';
         } else {
             $response['status'] = 'error';
-            $response['message'] = 'Ошибка удаления';
+            $response['message'] = 'Ошибка удаления' . $stmt->error;
         }
 
         $stmt->close();
 
         $result = $conn->query("
-        SELECT
+                SELECT
             users.id,
             users.username,
             users.email,
             users.gender_id,
             users.faculty_id,
-            genders.name   AS gender,
-            faculties.name AS faculty
+            genders.name AS gender,
+            faculties.name AS faculty,
+            intern_status.name AS status
         FROM users
-        JOIN genders   ON users.gender_id = genders.id
+        JOIN genders ON users.gender_id = genders.id
         JOIN faculties ON users.faculty_id = faculties.id
+        LEFT JOIN intern_status ON users.status_id = intern_status.id
+
         ");
         while ($row = $result->fetch_assoc()) {
             $response['users'][] = $row;
         }
 
+        echo json_encode($response);
+        exit;
+    }
+
+    if (empty($status_id)) {
+        $response['status'] = 'error';
+        $response['message'] = 'Выберите статус практики';
         echo json_encode($response);
         exit;
     }
@@ -140,9 +157,23 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
 
     if (!empty($id)) {
         $stmt = $conn->prepare(
-            "UPDATE users SET username = ?, email = ?, gender_id = ?, faculty_id = ? WHERE id = ?"
+            "UPDATE users
+     SET username = ?,
+         email = ?,
+         gender_id = ?,
+         faculty_id = ?,
+         status_id = ?
+     WHERE id = ?"
         );
-        $stmt->bind_param("ssiii", $username, $email, $gender_id, $faculty_id, $id);
+        $stmt->bind_param(
+            "ssiiii",
+            $username,
+            $email,
+            $gender_id,
+            $faculty_id,
+            $status_id,
+            $id
+        );
 
         if ($stmt->execute()) {
             $response['status'] = 'success';
@@ -155,17 +186,19 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
         $stmt->close();
 
         $result = $conn->query("
-        SELECT
+            SELECT
             users.id,
             users.username,
             users.email,
             users.gender_id,
             users.faculty_id,
-            genders.name   AS gender,
-            faculties.name AS faculty
+            genders.name AS gender,
+            faculties.name AS faculty,
+            intern_status.name AS status
         FROM users
-        JOIN genders   ON users.gender_id = genders.id
+        JOIN genders ON users.gender_id = genders.id
         JOIN faculties ON users.faculty_id = faculties.id
+        LEFT JOIN intern_status ON users.status_id = intern_status.id
         ");
 
         while ($row = $result->fetch_assoc()) {
@@ -176,8 +209,18 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
         exit;
     }
 
-    $stmt = $conn->prepare("INSERT INTO users (username, email, gender_id, faculty_id) VALUES (?, ?, ?, ?)");
-    $stmt->bind_param("ssii", $username, $email, $gender_id, $faculty_id);
+    $stmt = $conn->prepare(
+        "INSERT INTO users (username, email, gender_id, faculty_id, status_id)
+     VALUES (?, ?, ?, ?, ?)"
+    );
+    $stmt->bind_param(
+        "ssiii",
+        $username,
+        $email,
+        $gender_id,
+        $faculty_id,
+        $status_id
+    );
 
     if ($stmt->execute()) {
         $response['status'] = 'success';

@@ -28,6 +28,15 @@ $faculties = $conn->query("SELECT id, name FROM faculties");
         <?php endwhile; ?>
     </select><br><br>
 
+    <label>Статус практики:</label><br>
+    <select name="status_id">
+        <option value="">-- выберите --</option>
+        <option value="1">Ищет</option>
+        <option value="2">Работает</option>
+        <option value="3">Закончил</option>
+    </select><br><br>
+
+
     <button type="submit">Сохранить</button>
     <button type="button" id="searchBtn">Поиск</button>
 

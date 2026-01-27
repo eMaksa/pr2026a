@@ -6,11 +6,13 @@
         <th onclick="sortTable('email')" style="cursor:pointer">Email ▲▼</th>
         <th onclick="sortTable('gender')" style="cursor:pointer">Gender ▲▼</th>
         <th onclick="sortTable('faculty')" style="cursor:pointer">Faculty ▲▼</th>
+        <th onclick="sortTable('status')" style="cursor:pointer">Статус практики ▲▼</th>
+
         <th>Edit</th>
     </tr>
     <tbody id="usersBody">
         <tr>
-            <td colspan="5">Пользователей пока нет</td>
+            <td colspan="6">Пользователей пока нет</td>
         </tr>
     </tbody>
 </table>
