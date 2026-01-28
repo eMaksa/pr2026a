@@ -102,14 +102,14 @@
             });
         }
 
-        function editUser(id, username, email, gender_id, faculty_id) {
+        function editUser(id, username, email, gender_id, faculty_id, status_id) {
             document.getElementById('user_id').value = id;
             document.getElementById('username').value = username;
             document.querySelector('input[name="email"]').value = email;
 
             document.getElementById('gender').value = gender_id;
             document.getElementById('faculty').value = faculty_id;
-            document.querySelector('select[name="status_id"]').value = status_id;
+            document.querySelector('select[name="status_id"]').value = status_id ?? '';
         }
 
         function deleteUser(id) {

@@ -26,6 +26,7 @@ if ($_SERVER["REQUEST_METHOD"] === "GET") {
     ";
 
     $result = $conn->query($sql);
+    $response['users'] = [];
     while ($row = $result->fetch_assoc()) {
         $response['users'][] = $row;
     }
@@ -112,6 +113,7 @@ if ($_SERVER["REQUEST_METHOD"] === "POST") {
         $stmt->execute();
         $result = $stmt->get_result();
 
+        $response['users'] = [];
         while ($row = $result->fetch_assoc()) {
             $response['users'][] = $row;
         }
@@ -129,10 +131,6 @@ if ($_SERVER["REQUEST_METHOD"] === "POST") {
         $stmt->bind_param("i", $delete_id);
         $stmt->execute();
         $stmt->close();
-
-        $response['message'] = 'Пользователь удалён';
-        echo json_encode($response);
-        exit;
     }
 
     /* =======================
@@ -157,23 +155,47 @@ if ($_SERVER["REQUEST_METHOD"] === "POST") {
         $stmt->bind_param("ssiiii", $username, $email, $gender_id, $faculty_id, $status_id, $id);
         $stmt->execute();
         $stmt->close();
-
         $response['message'] = 'Пользователь обновлён';
-        echo json_encode($response);
-        exit;
     }
 
     /* =======================
        INSERT
     ======================= */
-    $stmt = $conn->prepare("
-        INSERT INTO users (username, email, gender_id, faculty_id, status_id)
-        VALUES (?, ?, ?, ?, ?)
-    ");
-    $stmt->bind_param("ssiii", $username, $email, $gender_id, $faculty_id, $status_id);
-    $stmt->execute();
-    $stmt->close();
+    if (empty($id)) {
+        $stmt = $conn->prepare("
+            INSERT INTO users (username, email, gender_id, faculty_id, status_id)
+            VALUES (?, ?, ?, ?, ?)
+        ");
+        $stmt->bind_param("ssiii", $username, $email, $gender_id, $faculty_id, $status_id);
+        $stmt->execute();
+        $stmt->close();
+        $response['message'] = 'Пользователь добавлен';
+    }
 
-    $response['message'] = 'Пользователь добавлен';
+    /* =======================
+       Возвращаем актуальный список
+    ======================= */
+    $sql = "
+        SELECT
+            users.id,
+            users.username,
+            users.email,
+            users.gender_id,
+            users.faculty_id,
+            users.status_id,
+            genders.name AS gender,
+            faculties.name AS faculty,
+            intern_status.name AS status
+        FROM users
+        JOIN genders ON users.gender_id = genders.id
+        JOIN faculties ON users.faculty_id = faculties.id
+        LEFT JOIN intern_status ON users.status_id = intern_status.id
+    ";
+    $result = $conn->query($sql);
+    $response['users'] = [];
+    while ($row = $result->fetch_assoc()) {
+        $response['users'][] = $row;
+    }
+
     echo json_encode($response);
 }
