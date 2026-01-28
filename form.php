@@ -1,6 +1,7 @@
 <?php
-$genders = $conn->query("SELECT id, name FROM genders");
+$genders   = $conn->query("SELECT id, name FROM genders");
 $faculties = $conn->query("SELECT id, name FROM faculties");
+$statuses  = $conn->query("SELECT id, name FROM intern_status");
 ?>
 
 <form method="POST" id="userForm">
@@ -29,12 +30,15 @@ $faculties = $conn->query("SELECT id, name FROM faculties");
     </select><br><br>
 
     <label>Статус практики:</label><br>
-    <select name="status_id">
-        <option value="">-- выберите --</option>
-        <option value="1">Ищет</option>
-        <option value="2">Работает</option>
-        <option value="3">Закончил</option>
-    </select><br><br>
+<select name="status_id" id="status">
+    <option value="">-- выберите --</option>
+    <?php while ($s = $statuses->fetch_assoc()): ?>
+        <option value="<?= $s['id'] ?>">
+            <?= htmlspecialchars($s['name']) ?>
+        </option>
+    <?php endwhile; ?>
+</select><br><br>
+
 
 
     <button type="submit">Сохранить</button>
