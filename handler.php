@@ -5,9 +5,10 @@ header('Content-Type: application/json');
 $response = ['status' => 'success', 'message' => '', 'users' => []];
 
 /* =======================
-   GET — загрузка всех
+   Универсальная загрузка пользователей
 ======================= */
-if ($_SERVER["REQUEST_METHOD"] === "GET") {
+function loadUsers($conn)
+{
     $sql = "
         SELECT
             users.id,
@@ -26,11 +27,20 @@ if ($_SERVER["REQUEST_METHOD"] === "GET") {
     ";
 
     $result = $conn->query($sql);
-    $response['users'] = [];
+    $users = [];
+
     while ($row = $result->fetch_assoc()) {
-        $response['users'][] = $row;
+        $users[] = $row;
     }
 
+    return $users;
+}
+
+/* =======================
+   GET — загрузка всех
+======================= */
+if ($_SERVER["REQUEST_METHOD"] === "GET") {
+    $response['users'] = loadUsers($conn);
     echo json_encode($response);
     exit;
 }
@@ -48,7 +58,6 @@ if ($_SERVER["REQUEST_METHOD"] === "POST") {
     $gender_id  = $_POST['gender_id'] ?? '';
     $faculty_id = $_POST['faculty_id'] ?? '';
     $status_id  = $_POST['status_id'] ?? '';
-
     /* =======================
        SEARCH
     ======================= */
@@ -131,12 +140,17 @@ if ($_SERVER["REQUEST_METHOD"] === "POST") {
         $stmt->bind_param("i", $delete_id);
         $stmt->execute();
         $stmt->close();
+
+        $response['message'] = 'Пользователь удалён';
+        $response['users'] = loadUsers($conn);
+        echo json_encode($response);
+        exit;
     }
 
     /* =======================
        VALIDATION
     ======================= */
-    if (empty($username) || empty($email) || empty($gender_id) || empty($faculty_id) || empty($status_id)) {
+    if (empty($username) || empty($email) || empty($gender_id) || empty($faculty_id) || empty($status_id) || empty($age)) {
         $response['status']  = 'error';
         $response['message'] = 'Все поля обязательны';
         echo json_encode($response);
@@ -152,50 +166,29 @@ if ($_SERVER["REQUEST_METHOD"] === "POST") {
             SET username = ?, email = ?, gender_id = ?, faculty_id = ?, status_id = ?
             WHERE id = ?
         ");
-        $stmt->bind_param("ssiiii", $username, $email, $gender_id, $faculty_id, $status_id, $id);
+        $stmt->bind_param("ssiiiii", $username, $email, $gender_id, $faculty_id, $status_id, $id);
         $stmt->execute();
         $stmt->close();
+
         $response['message'] = 'Пользователь обновлён';
+        $response['users'] = loadUsers($conn);
+        echo json_encode($response);
+        exit;
     }
 
     /* =======================
        INSERT
     ======================= */
-    if (empty($id)) {
-        $stmt = $conn->prepare("
-            INSERT INTO users (username, email, gender_id, faculty_id, status_id)
-            VALUES (?, ?, ?, ?, ?)
-        ");
-        $stmt->bind_param("ssiii", $username, $email, $gender_id, $faculty_id, $status_id);
-        $stmt->execute();
-        $stmt->close();
-        $response['message'] = 'Пользователь добавлен';
-    }
+    $stmt = $conn->prepare("
+        INSERT INTO users (username, email, gender_id, faculty_id, status_id)
+        VALUES (?, ?, ?, ?, ?, ?)
+    ");
+    $stmt->bind_param("ssiiii", $username, $email, $gender_id, $faculty_id, $status_id);
+    $stmt->execute();
+    $stmt->close();
 
-    /* =======================
-       Возвращаем актуальный список
-    ======================= */
-    $sql = "
-        SELECT
-            users.id,
-            users.username,
-            users.email,
-            users.gender_id,
-            users.faculty_id,
-            users.status_id,
-            genders.name AS gender,
-            faculties.name AS faculty,
-            intern_status.name AS status
-        FROM users
-        JOIN genders ON users.gender_id = genders.id
-        JOIN faculties ON users.faculty_id = faculties.id
-        LEFT JOIN intern_status ON users.status_id = intern_status.id
-    ";
-    $result = $conn->query($sql);
-    $response['users'] = [];
-    while ($row = $result->fetch_assoc()) {
-        $response['users'][] = $row;
-    }
-
+    $response['message'] = 'Пользователь добавлен';
+    $response['users'] = loadUsers($conn);
     echo json_encode($response);
+    exit;
 }

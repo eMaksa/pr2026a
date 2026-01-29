@@ -1,10 +1,16 @@
 <?php
 require_once 'db.php';
 
+// Выбираем случайного студента с информацией о факультете и статусе
 $sql = "
-    SELECT u.username, u.email, f.name AS faculty
+    SELECT 
+        u.username, 
+        u.email, 
+        f.name AS faculty,
+        s.name AS status
     FROM users u
     LEFT JOIN faculties f ON u.faculty_id = f.id
+    LEFT JOIN intern_status s ON u.status_id = s.id
     ORDER BY RAND()
     LIMIT 1
 ";
@@ -49,6 +55,7 @@ $student = $result->fetch_assoc();
     <p><strong>Имя:</strong> <?= htmlspecialchars($student['username']) ?></p>
     <p><strong>Факультет:</strong> <?= htmlspecialchars($student['faculty'] ?? '—') ?></p>
     <p><strong>Email:</strong> <?= htmlspecialchars($student['email']) ?></p>
+    <p><strong>Статус:</strong> <?= htmlspecialchars($student['status'] ?? '—') ?></p>
 </div>
 
 </body>

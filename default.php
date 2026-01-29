@@ -131,10 +131,25 @@
         }
 
         fetch('handler.php')
-            .then(r => r.json())
-            .then(data => renderTable(data.users))
-            .catch(() => {
-                messageDiv.textContent = 'Ошибка при загрузке пользователей';
+            .then(async r => {
+                if (!r.ok) {
+                    const text = await r.text();
+                    throw new Error(`HTTP ${r.status}: ${text}`);
+                }
+                return r.json();
+            })
+            .then(data => {
+                console.log('Ответ сервера:', data);
+                renderTable(data.users);
+            })
+            .catch(err => {
+                console.error(err); // реальная ошибка в консоли
+
+                messageDiv.textContent =
+                    err.message ?
+                    `Ошибка загрузки пользователей: ${err.message}` :
+                    'Неизвестная ошибка при загрузке пользователей';
+
                 messageDiv.style.color = 'red';
             });
 

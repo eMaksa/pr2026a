@@ -11,9 +11,14 @@ INSERT INTO intern_status (name) VALUES
 ALTER TABLE users
 ADD COLUMN status_id INT DEFAULT 1;
 
+ALTER TABLE users
+MODIFY status_id INT NOT NULL DEFAULT 1;
 
 UPDATE users SET status_id = 1 WHERE status_id IS NULL;
 
 ALTER TABLE users
 ADD CONSTRAINT fk_users_status
 FOREIGN KEY (status_id) REFERENCES intern_status(id);
+
+ALTER TABLE users 
+ADD INDEX idx_status (status_id);

@@ -11,14 +11,20 @@ echo "\xEF\xBB\xBF";
 
 $output = fopen('php://output', 'w');
 
-// заголовки
-fputcsv($output, ['ID', 'Username', 'Email', 'Faculty'], ';');
+// заголовки CSV
+fputcsv($output, ['ID', 'Username', 'Email', 'Faculty', 'Status'], ';');
 
-// запрос
+// запрос с JOIN статусом
 $sql = "
-    SELECT u.id, u.username, u.email, f.name AS faculty
+    SELECT 
+        u.id, 
+        u.username, 
+        u.email, 
+        f.name AS faculty,
+        s.name AS status
     FROM users u
     LEFT JOIN faculties f ON u.faculty_id = f.id
+    LEFT JOIN intern_status s ON u.status_id = s.id
 ";
 
 $result = $conn->query($sql);
@@ -29,7 +35,8 @@ if ($result) {
             $row['id'],
             $row['username'],
             $row['email'],
-            $row['faculty']
+            $row['faculty'],
+            $row['status']
         ], ';');
     }
 }
